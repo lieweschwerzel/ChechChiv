@@ -26,7 +26,7 @@ def check():
             if len(onlinePlayers) > 0:
                 print(str(len(onlinePlayers)/3) + " players")
                 playsound('audio.mp3', False)
-                var = input(getTime()+" Please ENTER to stop searching or other key to continue: ")
+                var = input(getTime()+" Player(s) found! Please ENTER to stop searching or other key to continue: ")
                 if len(var) == 0:
                     print("STOPPING")
                     break
@@ -42,7 +42,6 @@ def check():
             print("Internet desconnected?")
             time.sleep(30)
             check()
-
 
 
 check()
