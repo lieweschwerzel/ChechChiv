@@ -21,7 +21,6 @@ def check():
         try:
             htmldata = getdata("https://refactor.jp/chivalry/?serverId=1491190")
             soup = BeautifulSoup(htmldata, 'html.parser')
-            data = ''
             onlinePlayers = soup.find_all("td")
             if len(onlinePlayers) > 0:
                 print(str(len(onlinePlayers)/3) + " players")
@@ -39,7 +38,7 @@ def check():
                 continue
             # To handle exceptions
         except:
-            print("Internet desconnected?")
+            print("Internet disconnected?")
             time.sleep(30)
             check()
 
