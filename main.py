@@ -22,7 +22,7 @@ def checkserver():
                 userInput = input(
                     gettime() + " " + players + " players found! Please ENTER to stop searching or other key to search again: ")
                 if len(userInput) == 0:
-                    print("STOPPING")
+                    print("Done! Have fun playing")
                     break
                 else:
                     continue
