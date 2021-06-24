@@ -9,19 +9,20 @@ SLEEPTIME = 58
 
 
 def checkserver():
+    global players
     while True:
         try:
             htmldata = getdata("https://refactor.jp/chivalry/?serverId=1491190")
             soup = BeautifulSoup(htmldata, 'html.parser')
-            data = ''
             for data in soup.find_all("tt"):
                 players = data.get_text()[1:3]
 
             if players[0:1] != "0":
                 playsound('audio.mp3', False)
-                userInput = input(
-                    gettime() + " " + players + " players found! Please ENTER to stop searching or other key to search again: ")
-                if len(userInput) == 0:
+                userinput = input(
+                    gettime() + " " + players + "players found! Please ENTER to stop searching or other key to search "
+                                                "again: ")
+                if len(userinput) == 0:
                     print("Done! Have fun playing")
                     break
                 else:
