@@ -4,21 +4,22 @@ import requests
 from bs4 import BeautifulSoup
 from playsound import playsound
 from datetime import datetime
+import win32api
 
-SLEEPTIME = 58
-
+SLEEPTIME = 120 #seconds
 
 def checkserver():
     global players
     while True:
         try:
-            htmldata = getdata("https://refactor.jp/chivalry/?serverId=1491190")
+            htmldata = getdata("https://refactor.jp/chivalry/?serverId=1495246")
             soup = BeautifulSoup(htmldata, 'html.parser')
             for data in soup.find_all("tt"):
                 players = data.get_text()[1:3]
 
             if players[0:1] != "0":
                 playsound('audio.mp3', False)
+                win32api.MessageBox(0, players+' Players found', 'Result', 0x00001000)
                 userinput = input(
                     gettime() + " " + players + "players found! Please ENTER to stop searching or other key to search "
                                                 "again: ")
@@ -33,7 +34,7 @@ def checkserver():
                 continue
             # To handle exceptions
         except:
-            print("Internet disconnected?")
+            print("Internet disconnected? Server offline?")
             time.sleep(SLEEPTIME)
             checkserver()
 
