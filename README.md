@@ -1,2 +1,2 @@
 # ChechChiv
- check for players on server and play sound
+ check for players on server and sound alarm
