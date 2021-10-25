@@ -77,7 +77,8 @@ def update():
 def showinfo():
     global server_id
     server_id = askstring('serverId', 'Change Id here')
-    window.title("Check Chiv Server: " + server_id)
+    if server_id:
+        window.title("Check Chiv Server: " + server_id)
 
 
 window = tk.Tk()
