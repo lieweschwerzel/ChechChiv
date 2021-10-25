@@ -40,9 +40,6 @@ def check_server():
             # To handle exceptions
         except:
             return txt_edit.insert(tk.END, get_time() + " " + "Wrong ID or connection issues \n")
-            time.sleep(SLEEPTIME)
-            check_server()
-
 
 def get_time():
     now = datetime.now()
