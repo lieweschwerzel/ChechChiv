@@ -1,23 +1,22 @@
 # import module
 import time
 from tkinter import END
-
+from tkinter.messagebox import showinfo
+from tkinter.simpledialog import askstring
 import requests
 from bs4 import BeautifulSoup
 from playsound import playsound
 from datetime import datetime
 import tkinter as tk
 
-searching = True
 SLEEPTIME = 3000  # milliseconds
-
-server = "https://refactor.jp/chivalry/?serverId=1487217"
-# server = "https://refactor.jp/chivalry/?serverId=1486918"
-
+server_id = "1487217"
+server = "https://refactor.jp/chivalry/?serverId="
+searching = True
 
 def check_players():
     global players
-    htmldata = get_data(server)
+    htmldata = get_data(server+server_id)
     soup = BeautifulSoup(htmldata, 'html.parser')
     for data in soup.find_all("tt"):
         players = data.get_text()[1:3]
@@ -40,7 +39,7 @@ def check_server():
             return
             # To handle exceptions
         except:
-            print("Internet disconnected? Server offline?")
+            return txt_edit.insert(tk.END, get_time() + " " + "Wrong ID or connection issues \n")
             time.sleep(SLEEPTIME)
             check_server()
 
@@ -59,14 +58,14 @@ def get_data(url):
 def stop():
     global searching
     searching = False
-    window.title("Chiv Search")
+    window.title("Check Chiv Server: " + server_id)
     btn_open.config(text="Run Search", command=restart_server)
     txt_edit.insert(tk.END, get_time() + " " + "Stopped search \n")
     txt_edit.see(tk.END)
 
 
 def update():
-    window.title("Searching")
+    window.title("Searching: " + server_id)
     btn_open.config(text="Stop", command=stop)
     if check_players() > 1:
         txt_edit.insert(tk.END, get_time() + " " + players + " players online\n")
@@ -78,10 +77,16 @@ def update():
     window.after(SLEEPTIME, check_server)  # run  again after xxx ms
 
 
-window = tk.Tk()
-window.title("Check Chiv Servers")
+def showinfo():
+    global server_id
+    server_id = askstring('serverId', 'Change Id here')
+    window.title("Check Chiv Server: " + server_id)
 
-window.geometry("450x90")
+
+window = tk.Tk()
+window.title("Check Chiv Server: " + server_id)
+
+window.geometry("450x100")
 window.rowconfigure(0, minsize=200, weight=1)
 window.columnconfigure(1, minsize=300, weight=1)
 
@@ -90,7 +95,7 @@ label = tk.Label(window)
 txt_edit = tk.Text(window)
 fr_buttons = tk.Frame(window)
 btn_open = tk.Button(fr_buttons, text="Run Search", command=check_server)
-btn_save = tk.Button(fr_buttons, text="Change Server")
+btn_save = tk.Button(fr_buttons, text="Change Server", command=showinfo)
 
 window.rowconfigure(0, minsize=100, weight=1)
 btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
