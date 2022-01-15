@@ -1,28 +1,40 @@
 # import module
+from email.mime import audio
 import time
 from tkinter import END
+from tkinter.constants import N
 from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
+from winsound import PlaySound
 import requests
 from bs4 import BeautifulSoup
 from playsound import playsound
 from datetime import datetime
 import tkinter as tk
 
-SLEEPTIME = 3000  # milliseconds
-server_id = "1487217"
+SLEEPTIME = 60000  # milliseconds
+server_id = "1495246"
 server = "https://refactor.jp/chivalry/?serverId="
 searching = True
+name = "Sandclusterfck 1.X in Finland"
+
 
 def check_players():
     global players
     htmldata = get_data(server+server_id)
     soup = BeautifulSoup(htmldata, 'html.parser')
+    get_server_name(soup)
     for data in soup.find_all("tt"):
         players = data.get_text()[1:3]
         if players[1:2] == "/":
             players = players[0:1]
     return int(players)
+
+
+def get_server_name(soup):
+    global name
+    for data in soup.find_all("h2"):        
+        name = data.get_text()
 
 
 def restart_server():
@@ -62,15 +74,17 @@ def stop():
 
 
 def update():
-    window.title("Searching: " + server_id)
+    window.title("Searching: " + server_id + " " + name)
     btn_open.config(text="Stop", command=stop)
     if check_players() > 1:
         txt_edit.insert(tk.END, get_time() + " " + players + " players online\n")
+        playsound('audio.mp3', False)
     elif check_players() == 1:
         txt_edit.insert(tk.END, get_time() + " " + players + " player online\n")
+        playsound('audio.mp3', False)
     else:
-        txt_edit.insert(tk.END, get_time() + " Nobody is playing on this server" + "\n")
-    txt_edit.see(tk.END)
+        txt_edit.insert(tk.END, get_time() + " Nobody is playing on this server" + "\n")  
+    txt_edit.see(tk.END) #keep scolling to END in window
     window.after(SLEEPTIME, check_server)  # run  again after xxx ms
 
 
