@@ -45,13 +45,8 @@ def restart_server():
 
 
 def check_server():
-    while searching:
-        try:
-            update()
-            return
-            # To handle exceptions
-        except:
-            return txt_edit.insert(tk.END, get_time() + " " + "Wrong ID or connection issues \n")
+    if searching:
+        update()
 
 def get_time():
     now = datetime.now()
@@ -76,10 +71,11 @@ def stop():
 def update():
     window.title("Searching: " + server_id + " " + name)
     btn_open.config(text="Stop", command=stop)
-    if check_players() > 1:
+    playercheck= check_players()
+    if playercheck > 1:
         txt_edit.insert(tk.END, get_time() + " " + players + " players online\n")
         playsound('audio.mp3', False)
-    elif check_players() == 1:
+    elif playercheck == 1:
         txt_edit.insert(tk.END, get_time() + " " + players + " player online\n")
         playsound('audio.mp3', False)
     else:
