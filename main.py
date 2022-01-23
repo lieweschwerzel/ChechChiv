@@ -78,8 +78,7 @@ def playsound():
     winsound.PlaySound('SystemHand', winsound.SND_ASYNC + winsound.SND_LOOP)
 
 
-def update():
-    window.title("Searching: " + server_id + " " + name)
+def update():    
     btn_open.config(text="Stop", command=stop)
     playercheck = check_players()
     if playercheck > 1:
@@ -90,6 +89,7 @@ def update():
         playsound()
     else:
         txt_edit.insert(tk.END, get_time() + " Nobody is playing on this server" + "\n")    
+    window.title("Searching: " + server_id + " " + name)
     txt_edit.see(tk.END) #keep scolling to END in window
     window.after(SLEEPTIME, check_server)  # run  again after xxx ms
 
@@ -132,3 +132,5 @@ txt_edit.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=txt_edit.yview)
 
 window.mainloop()
+
+
