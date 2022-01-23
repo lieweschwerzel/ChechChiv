@@ -1,22 +1,27 @@
 # import module
-from email.mime import audio
+import os
+import sys
 import time
 from tkinter import END
 from tkinter.constants import N
 from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
+import winsound
+from playsound import playsound
 from winsound import PlaySound
 import requests
 from bs4 import BeautifulSoup
-from playsound import playsound
+
 from datetime import datetime
 import tkinter as tk
+import multiprocessing
 
 SLEEPTIME = 60000  # milliseconds
 server_id = "1495246"
 server = "https://refactor.jp/chivalry/?serverId="
 searching = True
 name = "Sandclusterfck 1.X in Finland"
+file = os.path.join(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))),'audio.mp3')
 
 
 def check_players():
@@ -60,6 +65,7 @@ def get_data(url):
 
 
 def stop():
+    winsound.PlaySound(None, winsound.SND_FILENAME)
     global searching
     searching = False
     window.title("Check Chiv Server: " + server_id)
@@ -67,28 +73,37 @@ def stop():
     txt_edit.insert(tk.END, get_time() + " " + "Stopped search \n")
     txt_edit.see(tk.END)
 
+#default winsounds 
+def playsound():    
+    winsound.PlaySound('SystemHand', winsound.SND_ASYNC + winsound.SND_LOOP)
+
 
 def update():
     window.title("Searching: " + server_id + " " + name)
     btn_open.config(text="Stop", command=stop)
-    playercheck= check_players()
+    playercheck = check_players()
     if playercheck > 1:
         txt_edit.insert(tk.END, get_time() + " " + players + " players online\n")
-        playsound('audio.mp3', False)
+        playsound()
     elif playercheck == 1:
         txt_edit.insert(tk.END, get_time() + " " + players + " player online\n")
-        playsound('audio.mp3', False)
+        playsound()
     else:
-        txt_edit.insert(tk.END, get_time() + " Nobody is playing on this server" + "\n")  
+        txt_edit.insert(tk.END, get_time() + " Nobody is playing on this server" + "\n")    
     txt_edit.see(tk.END) #keep scolling to END in window
     window.after(SLEEPTIME, check_server)  # run  again after xxx ms
 
 
-def showinfo():
+def showinfo():    
     global server_id
+    global searching
     server_id = askstring('serverId', 'Change Id here')
     if server_id:
         window.title("Check Chiv Server: " + server_id)
+    stop()
+    searching = True
+    check_server()
+
 
 
 window = tk.Tk()
