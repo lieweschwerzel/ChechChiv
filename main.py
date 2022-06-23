@@ -1,28 +1,29 @@
 # import module
+from asyncio import events
+from email.mime import audio
 import os
 import sys
 import time
+import PySimpleGUI as sg
+
 from tkinter import END
 from tkinter.constants import N
 from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
-import winsound
-from playsound import playsound
 from winsound import PlaySound
 import requests
 from bs4 import BeautifulSoup
-
+from playsound import playsound
 from datetime import datetime
-import tkinter as tk
-import multiprocessing
 
-SLEEPTIME = 60000  # milliseconds
+
+SLEEPTIME = 6000  # milliseconds
 server_id = "1495246"
 server = "https://refactor.jp/chivalry/?serverId="
 searching = True
 name = "Sandclusterfck 1.X in Finland"
-file = os.path.join(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))),'audio.mp3')
-
+file = os.path.join(getattr(sys, '_MEIPASS', os.path.abspath(
+    os.path.dirname(__file__))), 'audio.mp3')
 
 def check_players():
     global players
@@ -38,7 +39,7 @@ def check_players():
 
 def get_server_name(soup):
     global name
-    for data in soup.find_all("h2"):        
+    for data in soup.find_all("h2"):
         name = data.get_text()
 
 
@@ -46,12 +47,19 @@ def restart_server():
     global searching
     searching = True
     txt_edit.delete(1.0, END)
+    stop()
     check_server()
 
 
 def check_server():
-    if searching:
-        update()
+    while searching:
+        try:
+            update()
+            return
+            # To handle exceptions
+        except:
+            return txt_edit.insert(tk.END, get_time() + " " + "Wrong ID or connection issues \n")
+
 
 def get_time():
     now = datetime.now()
@@ -63,74 +71,127 @@ def get_data(url):
     r = requests.get(url)
     return r.text
 
-
-def stop():
-    winsound.PlaySound(None, winsound.SND_FILENAME)
-    global searching
-    searching = False
-    window.title("Check Chiv Server: " + server_id)
-    btn_open.config(text="Run Search", command=restart_server)
-    txt_edit.insert(tk.END, get_time() + " " + "Stopped search \n")
-    txt_edit.see(tk.END)
-
-#default winsounds 
-def playsound():    
-    winsound.PlaySound('SystemHand', winsound.SND_ASYNC + winsound.SND_LOOP)
-
-
-def update():    
-    btn_open.config(text="Stop", command=stop)
-    playercheck = check_players()
-    if playercheck > 1:
-        txt_edit.insert(tk.END, get_time() + " " + players + " players online\n")
-        playsound()
-    elif playercheck == 1:
-        txt_edit.insert(tk.END, get_time() + " " + players + " player online\n")
-        playsound()
+def scan(): 
+    while searching:
+        try:
+            update()
+            return
+            # To handle exceptions
+        except:
+            return #txt_edit.insert(tk.END, get_time() + " " + "Wrong ID or connection issues \n")
+ 
+def update():
+    check_players()       
+    if int(players) > 0:        
+        print(players)
+        window['-TEXT-'].update(players)
+        scan_button.Update("stop")  
     else:
-        txt_edit.insert(tk.END, get_time() + " Nobody is playing on this server" + "\n")    
-    window.title("Searching: " + server_id + " " + name)
-    txt_edit.see(tk.END) #keep scolling to END in window
-    window.after(SLEEPTIME, check_server)  # run  again after xxx ms
+        window['-TEXT-'].update("No Players found")      
+    time.sleep(SLEEPTIME)
+    scan()
 
 
-def showinfo():    
-    global server_id
-    global searching
-    server_id = askstring('serverId', 'Change Id here')
-    if server_id:
-        window.title("Check Chiv Server: " + server_id)
-    stop()
-    searching = True
-    check_server()
+scan_button = sg.ReadFormButton("scan", bind_return_key=True)
+
+left_col = [
+  #  [sg.Button("scan", key='-B1-')],
+    [scan_button]
+]
+
+right_col = [
+    [sg.Text("Hi", key='-TEXT-')]
+]
+
+layout = [
+    [
+        left_col,
+        sg.Frame(layout = right_col, title='', size = (250, 300)),
+    ]
+    # [sg.Text("Hi", key='-TEXT-')],
+    # [scan_button]
+    #
+]
+
+#create window
+window = sg.Window("Chivalry Server", layout, margins=(10,10))
+
+#create event loop
+while True:
+    event, values = window.read()
+
+    #close when user closes window or presses OK
+    if event == sg.WIN_CLOSED:        
+        break
+    if event == "scan":
+        scan()
+     #   scan_button.Update('scan') 
+
+
+window.close()
+
+
+# def stop():
+#     global searching
+#     searching = False
+#     window.title("Check Chiv Server: " + server_id)
+#     btn_open.config(text="Run Search", command=restart_server)
+#     txt_edit.insert(tk.END, get_time() + " " + "Stopped search \n")
+#     txt_edit.see(tk.END)
 
 
 
-window = tk.Tk()
-window.title("Check Chiv Server: " + server_id)
-
-window.geometry("450x100")
-window.rowconfigure(0, minsize=200, weight=1)
-window.columnconfigure(1, minsize=300, weight=1)
-
-scrollbar = tk.Scrollbar(window)
-label = tk.Label(window)
-txt_edit = tk.Text(window)
-fr_buttons = tk.Frame(window)
-btn_open = tk.Button(fr_buttons, text="Run Search", command=check_server)
-btn_save = tk.Button(fr_buttons, text="Change Server", command=showinfo)
-
-window.rowconfigure(0, minsize=100, weight=1)
-btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
-btn_save.grid(row=1, column=0, sticky="ew", padx=5)
-fr_buttons.grid(row=0, column=0, sticky="ns")
-txt_edit.grid(row=0, column=1, sticky="nsew")
-scrollbar.grid(row=0, column=3, rowspan=2,  sticky="nsew")
-label.grid(row=2, column=1, sticky="nsew")
-
-txt_edit.config(yscrollcommand=scrollbar.set)
-scrollbar.config(command=txt_edit.yview)
-
-window.mainloop()
 
 
+   # window.title("Searching: " + server_id + " " + name)
+    # btn_open.config(text="Stop", command=stop)
+    # playercheck = check_players()
+    # if playercheck > 1:
+    #     txt_edit.insert(tk.END, get_time() + " " +
+    #                     players + " players online\n")
+    #     playsound(file, False)
+    # elif playercheck == 1:
+    #     txt_edit.insert(tk.END, get_time() + " " +
+    #                     players + " player online\n")
+    #     playsound(file, False)
+    # else:
+    #     txt_edit.insert(tk.END, get_time() +
+    #                     " Nobody is playing on this server" + "\n")
+    # txt_edit.see(tk.END)  # keep scolling to END in window
+    # window.after(SLEEPTIME, check_server)  # run  again after xxx ms
+
+
+# def showinfo():
+#     global server_id
+#     server_id = askstring('serverId', 'Change Id here')
+#     if server_id:
+#         window.title("Check Chiv Server: " + server_id)
+
+
+# window = tk.Tk()
+# window.title("Check Chiv Server: " + server_id)
+
+# window.geometry("650x200")
+# window.rowconfigure(0, minsize=10, weight=1)
+# window.columnconfigure(1, minsize=100, weight=1)
+
+# scrollbar = tk.Scrollbar(window)
+# label = tk.Label(window)
+# txt_edit = tk.Text(window)
+# sec_edit = tk.Entry(window)
+# fr_buttons = tk.Frame(window)
+# btn_open = tk.Button(fr_buttons, text="Run Search", command=check_server)
+# btn_save = tk.Button(fr_buttons, text="Change Server", command=showinfo)
+
+# btn_open.grid(row=1, column=1, sticky="ew", padx=5, pady=5)
+# btn_save.grid(row=2, column=1, sticky="ew", padx=5, pady=5)
+# sec_edit.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+# fr_buttons.grid(row=0, column=1, sticky="ns")
+# txt_edit.grid(row=0, column=2, sticky="nsew")
+# scrollbar.grid(row=0, column=4, rowspan=2,  sticky="nsew")
+# label.grid(row=2, column=2, sticky="nsew")
+
+# txt_edit.config(yscrollcommand=scrollbar.set)
+# scrollbar.config(command=txt_edit.yview)
+
+# window.mainloop()
