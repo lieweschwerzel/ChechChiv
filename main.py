@@ -46,7 +46,6 @@ def get_server_name(soup):
 def restart_server():
     global searching
     searching = True
-    txt_edit.delete(1.0, END)
     stop()
     check_server()
 
@@ -72,29 +71,44 @@ def get_data(url):
     return r.text
 
 def scan():
-    update()
-    print('3 sec')
-    window.read(timeout=4000)      
-    print("voorbij")  
-    scan()
+    while searching:
+        try:
+            update()
+            print('3 sec')
+            window.read(timeout=4000)      
+            print("voorbij")  
+            scan()
+            return
+            # To handle exceptions
+        except:
+            return print(get_time() + " " + "Wrong ID or connection issues \n")
 
- 
+
 def update():
+    global searching
     update_players = check_players()
     print(update_players)    
     scan_button.Update('stop')
     window['-TEXT-'].update(get_time() + " " + str(update_players) +"\n", append=True)
-    if event == 'scan':
+    if event == 'stop':
         print("ASDSDAFSADFSAF") 
-    #window.refresh()
+        searching = False
+
    # window['-TEXT-'].update("Players on this server: " +str(update_players))
+
+
+def stop():
+    global searching
+    searching = False
+
+
+
 
 
 scan_button = sg.Button('scan', bind_return_key=True)
 text = sg.Multiline(size=(30, 15), autoscroll=True, key='-TEXT-')
 
 left_col = [
-  #  [sg.Button("scan", key='-B1-')],
     [scan_button]
 ]
 
@@ -107,9 +121,6 @@ layout = [
         left_col,
         sg.Frame(layout = right_col, title='', size = (250, 300)),
     ]
-    # [sg.Text("Hi", key='-TEXT-')],
-    # [scan_button]
-    #
 ]
 
 #create window
@@ -124,19 +135,17 @@ while True:
         break
     if event == 'scan':
         scan()
-    if event == 'stop':
-        print("ASDSDAFSADFSAF")
+  
     
 window.close()
 
 
-# def stop():
-#     global searching
-#     searching = False
-#     window.title("Check Chiv Server: " + server_id)
-#     btn_open.config(text="Run Search", command=restart_server)
-#     txt_edit.insert(tk.END, get_time() + " " + "Stopped search \n")
-#     txt_edit.see(tk.END)
+
+
+    # window.title("Check Chiv Server: " + server_id)
+    # btn_open.config(text="Run Search", command=restart_server)
+    # txt_edit.insert(tk.END, get_time() + " " + "Stopped search \n")
+    # txt_edit.see(tk.END)
 
 
 
