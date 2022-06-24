@@ -71,28 +71,27 @@ def get_data(url):
     r = requests.get(url)
     return r.text
 
-def scan(): 
-    while searching:
-        try:
-            update()
-            return
-            # To handle exceptions
-        except:
-            return #txt_edit.insert(tk.END, get_time() + " " + "Wrong ID or connection issues \n")
- 
-def update():
-    check_players()       
-    if int(players) > 0:        
-        print(players)
-        window['-TEXT-'].update(players)
-        scan_button.Update("stop")  
-    else:
-        window['-TEXT-'].update("No Players found")      
-    time.sleep(SLEEPTIME)
+def scan():
+    update()
+    print('3 sec')
+    window.read(timeout=4000)      
+    print("voorbij")  
     scan()
 
+ 
+def update():
+    update_players = check_players()
+    print(update_players)    
+    scan_button.Update('stop')
+    window['-TEXT-'].update(get_time() + " " + str(update_players) +"\n", append=True)
+    if event == 'scan':
+        print("ASDSDAFSADFSAF") 
+    #window.refresh()
+   # window['-TEXT-'].update("Players on this server: " +str(update_players))
 
-scan_button = sg.ReadFormButton("scan", bind_return_key=True)
+
+scan_button = sg.Button('scan', bind_return_key=True)
+text = sg.Multiline(size=(30, 15), autoscroll=True, key='-TEXT-')
 
 left_col = [
   #  [sg.Button("scan", key='-B1-')],
@@ -100,7 +99,7 @@ left_col = [
 ]
 
 right_col = [
-    [sg.Text("Hi", key='-TEXT-')]
+    [text]
 ]
 
 layout = [
@@ -123,11 +122,11 @@ while True:
     #close when user closes window or presses OK
     if event == sg.WIN_CLOSED:        
         break
-    if event == "scan":
+    if event == 'scan':
         scan()
-     #   scan_button.Update('scan') 
-
-
+    if event == 'stop':
+        print("ASDSDAFSADFSAF")
+    
 window.close()
 
 
