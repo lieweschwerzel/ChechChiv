@@ -1,6 +1,8 @@
 # import module
+import threading
 from asyncio import events
 from email.mime import audio
+from gettext import gettext
 import os
 import sys
 import time
@@ -71,11 +73,12 @@ def get_data(url):
     return r.text
 
 def scan():
+    global searching
     while searching:
-        try:
+        try:     
             update()
-            print('3 sec')
-            window.read(timeout=4000)      
+            print('6 sec')
+            window.read(timeout=6000)      
             print("voorbij")  
             scan()
             return
@@ -88,28 +91,22 @@ def update():
     global searching
     update_players = check_players()
     print(update_players)    
-    scan_button.Update('stop')
     window['-TEXT-'].update(get_time() + " " + str(update_players) +"\n", append=True)
-    if event == 'stop':
-        print("ASDSDAFSADFSAF") 
-        searching = False
-
+    #window['-STOP-'].click(stop) 
    # window['-TEXT-'].update("Players on this server: " +str(update_players))
-
 
 def stop():
     global searching
     searching = False
+    print("ASDSDAFSADFSAF") 
 
 
-
-
-
-scan_button = sg.Button('scan', bind_return_key=True)
+scan_button = sg.Button('scan')
+stop_button = sg.Button('stop', key='-STOP-', enable_events=True )
 text = sg.Multiline(size=(30, 15), autoscroll=True, key='-TEXT-')
 
 left_col = [
-    [scan_button]
+    [scan_button, stop_button, sg.Cancel()]
 ]
 
 right_col = [
@@ -127,15 +124,19 @@ layout = [
 window = sg.Window("Chivalry Server", layout, margins=(10,10))
 
 #create event loop
-while True:
-    event, values = window.read()
+while searching:
+    event, values = window.read(timeout=100)
 
     #close when user closes window or presses OK
     if event == sg.WIN_CLOSED:        
         break
-    if event == 'scan':
-        scan()
-  
+    # if event == 'scan':
+    #     scan()
+    if event == "scan":        
+        searching = True    # New statement
+        threading.Thread(target=scan(), daemon=True).start() #scan()
+    if event == '-STOP-':
+        print("stoppped")
     
 window.close()
 
