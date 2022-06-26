@@ -3,25 +3,19 @@ import webbrowser
 from email.policy import default
 import os
 import sys
-import time
 from tkinter import *
-from tkinter.constants import N
-from tkinter.messagebox import showinfo
-from tkinter.simpledialog import askstring
 from turtle import bgcolor, title, width
 import winsound
 from playsound import playsound
 from winsound import PlaySound
 import requests
 from bs4 import BeautifulSoup
-
 from datetime import datetime
 import tkinter as tk
-import multiprocessing
 
 server = "https://refactor.jp/chivalry/?serverId="
 searching = True
-
+DEFAULT_SERVER_ID = '1495246'
 name = "Sandclusterfck 1.X in Finland"
 file = os.path.join(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))),'audio.mp3')
 
@@ -95,36 +89,32 @@ def update():
         txt_edit.insert(tk.END, get_time() + " Nobody is playing on this server" + "\n")    
     window.title("Searching: " + e.get() + " " + name)
     txt_edit.see(tk.END) #keep scolling to END in window
-    window.after((int(sleeptime)*60000), check_server)  # run  again after xxx ms
+    window.after(int(float(sleeptime)*60000), check_server)  # run  again after xxx ms
 
-
-def showinfo():    
-    global server_id
-    global searching
-    server_id = askstring('serverId', 'Change Id here')
-    if server_id:
-        window.title("Check Chiv Server: " + server_id)
-    stop()
-    searching = True
-    check_server()
-
+#open link to website
 def callback(event):
     webbrowser.open_new(event.widget.cget("text"))
 
 
+
+
+#####################Front TK ####################
+
 window = tk.Tk()
 
-
 window.geometry("370x230")
+window.minsize(370,230)
+window.maxsize(370,230)
+window.resizable(0,0)
 #window.configure(bg = "black")
 
 scrollbar = tk.Scrollbar(window)
 label = tk.Label(window, text="min(s)")
 txt_edit = tk.Text(window, height=10, width=45)
 fr_buttons = tk.Frame(window)
-btn_runstop = tk.Button(fr_buttons, text="Run Search", command=check_server)
+btn_runstop = tk.Button(fr_buttons, width=10, text="Run Search", command=check_server)
 e = Entry(fr_buttons, justify='center', width=11)  
-e.insert(END, '1495246')
+e.insert(END, DEFAULT_SERVER_ID)
 e_minutes = Entry(window, justify='center', width=3)  
 e_minutes.insert(END, 1)
 window.title("Check Chiv Server: " + e.get())
@@ -137,14 +127,15 @@ window.columnconfigure(0, weight=1)
 fr_buttons.grid(row=0, column=0, padx=10, pady=5, sticky=E)
 e.grid(row=0, column=0, padx=5)
 btn_runstop.grid(row=0, column=1, padx=5, pady=5)
-e_minutes.grid(row= 0, column=0, padx=45, sticky=W)
-txt_edit.grid(row=1, column=0, padx=10, sticky=W)
-scrollbar.grid(row=1, column=1, rowspan=1)
-label.grid(row=0, column=0, sticky=W)
+label.grid(row=0, column=0, padx=10, sticky=W)
+e_minutes.grid(row= 0, column=0, padx=50, sticky=W)
+txt_edit.grid(row=1, column=0, padx=(10,0), sticky=W)
+scrollbar.grid(row=1, column=2, rowspan=2, sticky="nsew")
+
 
 txt_edit.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=txt_edit.yview)
-check_server()
+
 
 window.mainloop()
 
