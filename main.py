@@ -130,14 +130,14 @@ btn_runstop = tk.Button(fr_buttons, width=10, text="Run Search", command=run_sea
 entry_id = Entry(fr_buttons, justify='center', width=11)  
 entry_id.insert(END, DEFAULT_SERVER_ID)
 e_minutes = Entry(window, justify='center', width=3)  
-e_minutes.insert(END, 1)
+e_minutes.insert(END, 5)
 window.title("Check Chiv Server: " + entry_id.get())
 
 cb_entry = IntVar()
 checkbox = tk.Checkbutton(window, text="Alarm", variable=cb_entry, onvalue=1, offvalue=0, command=isChecked)
 checkbox.select()
 
-lbl = tk.Label(window, text=r"https://refactor.jp/chivalry/?country=CONTINENT_EU", fg="grey", cursor="hand2")
+lbl = tk.Label(window, text=r"https://refactor.jp/chivalry/?serverId=" + DEFAULT_SERVER_ID, fg="grey", cursor="hand2")
 lbl.grid(row=2, column=0)
 lbl.bind("<Button-1>", callback)
 
