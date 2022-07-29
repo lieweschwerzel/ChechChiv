@@ -59,7 +59,7 @@ def check_players():
 def run_search():
     global Timer_id
     
-    sleeptime = e_minutes.get()        
+    sleeptime = entry_minutes.get()        
     btn_runstop.config(text="Stop", command=stop_search)
     playercheck = check_players()
     if playercheck > 1:
@@ -129,8 +129,8 @@ fr_buttons = tk.Frame(window)
 btn_runstop = tk.Button(fr_buttons, width=10, text="Run Search", command=run_search)
 entry_id = Entry(fr_buttons, justify='center', width=11)  
 entry_id.insert(END, DEFAULT_SERVER_ID)
-e_minutes = Entry(window, justify='center', width=3)  
-e_minutes.insert(END, 5)
+entry_minutes = Entry(window, justify='center', width=3)  
+entry_minutes.insert(END, 5)
 window.title("Check Chiv Server: " + entry_id.get())
 
 cb_entry = IntVar()
@@ -146,7 +146,7 @@ fr_buttons.grid(row=0, column=0, padx=10, pady=5, sticky=E)
 entry_id.grid(row=0, column=0, padx=5)
 btn_runstop.grid(row=0, column=1, padx=(5,0), pady=5)
 label.grid(row=0, column=0, padx=10, sticky=W)
-e_minutes.grid(row= 0, column=0, padx=50, sticky=W)
+entry_minutes.grid(row= 0, column=0, padx=50, sticky=W)
 checkbox.grid(row=0, column=0, padx=(100,0), sticky=W)
 txt_main.grid(row=1, column=0, padx=(10,0), sticky=W)
 scrollbar.grid(row=1, column=2, rowspan=2, sticky=NSEW)
