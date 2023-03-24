@@ -12,9 +12,11 @@ from winsound import PlaySound
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+import urllib.request as urllib2
+from urllib.error import HTTPError
 
 
-server = "https://refactor.jp/chivalry/?serverId="
+url = "https://refactor.jp/chivalry/?serverId="
 Timer_id = None #timer voor window.after(schedule)
 DEFAULT_SERVER_ID = '1495246'
 player_names = []
@@ -29,32 +31,48 @@ def check_players():
     #get serverId from input entry
     server_id = entry_id.get()
     # link for extract html data
-    htmldata = requests.get(server+server_id).text
-    soup = BeautifulSoup(htmldata, 'html.parser')
 
+    try:
+        html = urllib2.urlopen(url+DEFAULT_SERVER_ID).read() 
+
+    except HTTPError as err:
+    	 if err.code == 404:
+            return 0
+
+    
+    soup = BeautifulSoup(html, 'lxml')
+    table  = soup.find('table', { 'class' : 'playerList' })
+  
+    rows = tableDataText(table)
 
     # #get servername
     for data in soup.find_all("h2"):        
         name = data.get_text()
+
+    ## get player names (unused)
+    for s in rows[1:]:
+       player_names.append(*s[:1])
    
-    #get amount players
-    for data in soup.find_all("tt"):
-        players = data.get_text()[1:3]
-        if players[1:2] == "/":
-            players = players[0:1]
+    players = str(len(player_names))
+    return len(player_names)
 
-    
-    raw_player_names = soup.find_all("td")
-    # i = 0
-    # while i < (len(raw_player_names)-1):
-    #     player_names.append(raw_player_names[i])
-    #     i+3
-    
-    print(len(raw_player_names))
-
-       
-    return int(players)
-
+def tableDataText(table):    
+    """Parses a html segment started with tag <table> followed 
+    by multiple <tr> (table rows) and inner <td> (table data) tags. 
+    It returns a list of rows with inner columns. 
+    Accepts only one <th> (table header/data) in the first row.
+    """
+    def rowgetDataText(tr, coltag='td'): # td (data) or th (header)       
+        return [td.get_text(strip=True) for td in tr.find_all(coltag)]  
+    rows = []
+    trs = table.find_all('tr')
+    headerow = rowgetDataText(trs[0], 'th')
+    if headerow: # if there is a header row include first
+        rows.append(headerow)
+        trs = trs[1:]
+    for tr in trs: # for every table row
+        rows.append(rowgetDataText(tr, 'td') ) # data row       
+    return rows
 
 def run_search():
     global Timer_id
