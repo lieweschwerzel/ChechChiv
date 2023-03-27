@@ -15,6 +15,7 @@ from datetime import datetime
 import urllib.request as urllib2
 from urllib.error import HTTPError
 
+# TO EXE: pyinstaller --onefile --noconsole main.py
 
 url = "https://refactor.jp/chivalry/?serverId="
 Timer_id = None #timer voor window.after(schedule)
@@ -28,18 +29,19 @@ def check_players():
     global players
     global player_names
     global name
+    global server_id
     #get serverId from input entry
     server_id = entry_id.get()
+    lbl.config(text = r"https://refactor.jp/chivalry/?serverId=" + server_id)
     # link for extract html data
 
     try:
-        html = urllib2.urlopen(url+DEFAULT_SERVER_ID).read() 
+        html = urllib2.urlopen(url+server_id).read() 
 
     except HTTPError as err:
     	 if err.code == 404:
-            return 0
+            return -1
 
-    
     soup = BeautifulSoup(html, 'lxml')
     table  = soup.find('table', { 'class' : 'playerList' })
   
@@ -50,6 +52,7 @@ def check_players():
         name = data.get_text()
 
     ## get player names (unused)
+    player_names.clear()
     for s in rows[1:]:
        player_names.append(*s[:1])
    
@@ -86,7 +89,9 @@ def run_search():
     elif playercheck == 1:
         txt_main.insert(tk.END, get_time() + "  " + players + " player online\n")
         playsound()
-    else:
+    elif playercheck == -1:
+        txt_main.insert(tk.END, get_time() + "  HTTP 404 error\n")        
+    else:        
         txt_main.insert(tk.END, get_time() + "  Nobody is playing on this server" + "\n")    
     window.title("Searching: " + entry_id.get() + " " + name)
     txt_main.see(tk.END) #keep scolling to END in window    
@@ -110,7 +115,7 @@ def stop_search():
 
 
 def reset_search():
-    txt_main.delete(1.0, END)
+    txt_main.delete(1.0, END)    
     run_search()
 
 
